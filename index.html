@@ -1,25 +1,23 @@
 <body>
   <h1 style="display: none;">山豬實行</h1>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/crypto-js/4.1.1/crypto-js.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
   <script>
     async function start() {
       await liff.init({ liffId: "你的 LIFF ID" });
       if (!liff.isLoggedIn()) liff.login();
 
-      const params = new URLSearchParams(location.search);
-      const encrypted = params.get("msg");
+      const urlParams = new URLSearchParams(window.location.search);
+      const encrypted = urlParams.get("msg");
       if (!encrypted) return;
 
-      // 解密
-      try {
-        const decrypted = CryptoJS.AES.decrypt(encrypted, "boar").toString(CryptoJS.enc.Utf8);
-        if (!decrypted) throw new Error("解密失敗");
+      // 使用密碼 boar 解密
+      const decrypted = CryptoJS.AES.decrypt(encrypted, "boar").toString(CryptoJS.enc.Utf8);
 
-        await liff.sendMessages([{ type: "text", text: decrypted }]);
-        liff.closeWindow();
-      } catch (e) {
-        alert("無法解密訊息。請確認連結正確。");
-      }
+      // 傳送純文字訊息
+      await liff.sendMessages([{ type: "text", text: decrypted }]);
+
+      // 自動關閉
+      liff.closeWindow();
     }
     start();
   </script>
