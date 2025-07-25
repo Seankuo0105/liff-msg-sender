@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>LIFF 傳訊息</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
+<body>
+  <h2>🔐 LIFF 訊息傳送器</h2>
+  <p id="messageArea">正在解析訊息中...</p>
+  <button id="sendBtn" disabled>📤 傳送訊息給自己</button>
+
+  <script>
+    const liffId = "2007811704-WalDOlAy"; // 你的 LIFF ID
+    const params = new URLSearchParams(window.location.search);
+    const rawMsg = params.get("msg");
+    const decodedMsg = rawMsg ? decodeURIComponent(rawMsg) : null;
+
+    const msgArea = document.getElementById("messageArea");
+    const sendBtn = document.getElementById("sendBtn");
+
+    if (!decodedMsg) {
+      msgArea.innerText = "❗️無效的網址參數，請使用 ?msg=編碼訊息";
+    } else {
+      msgArea.innerText = `📨 將傳送內容：「${decodedMsg}」`;
+      sendBtn.disabled = false;
+    }
+
+    liff.init({ liffId }).then(() => {
+      if (!liff.isLoggedIn()) liff.login();
+    });
+
+    sendBtn.onclick = async () => {
+      if (!liff.isInClient()) {
+        alert("⚠️ 請在 LINE 中開啟此頁面");
+        return;
+      }
+
+      try {
+        await liff.sendMessages([{ type: "text", text: decodedMsg }]);
+        alert("✅ 訊息已傳送！");
+      } catch (e) {
+        console.error(e);
+        alert("❌ 傳送失敗");
+      }
+    };
+  </script>
+</body>
+</html>
