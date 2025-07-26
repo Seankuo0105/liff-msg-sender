@@ -1,24 +1,40 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>山豬自動傳訊息</title>
+  <script src="https://static.line-scdn.net/liff/edge/2/sdk.js"></script>
+</head>
 <body>
-  <h1 style="display: none;">山豬實行</h1>
-  <script src="https://cdn.jsdelivr.net/npm/crypto-js@4.1.1/crypto-js.min.js"></script>
+  <h3 id="status">初始化中...</h3>
+
   <script>
-    async function start() {
-      await liff.init({ liffId: "你的 LIFF ID" });
-      if (!liff.isLoggedIn()) liff.login();
+    async function main() {
+      await liff.init({ liffId: "你的 LIFF ID" }); // ←請填你剛剛在 LINE Developers 上建立的 LIFF ID
 
-      const urlParams = new URLSearchParams(window.location.search);
-      const encrypted = urlParams.get("msg");
-      if (!encrypted) return;
+      if (!liff.isLoggedIn()) {
+        liff.login();
+        return;
+      }
 
-      // 使用密碼 boar 解密
-      const decrypted = CryptoJS.AES.decrypt(encrypted, "boar").toString(CryptoJS.enc.Utf8);
-
-      // 傳送純文字訊息
-      await liff.sendMessages([{ type: "text", text: decrypted }]);
-
-      // 自動關閉
-      liff.closeWindow();
+      // 使用者已登入，可以傳送訊息
+      try {
+        await liff.sendMessages([
+          {
+            type: "text",
+            text: "我是山豬"
+          }
+        ]);
+        document.getElementById("status").innerText = "✅ 已傳送「我是山豬」訊息！";
+        // 傳送完自動關閉 LIFF 視窗
+        setTimeout(() => liff.closeWindow(), 1500);
+      } catch (err) {
+        console.error("傳送訊息失敗", err);
+        document.getElementById("status").innerText = "❌ 傳送失敗：" + err.message;
+      }
     }
-    start();
+
+    main();
   </script>
 </body>
+</html>
